@@ -6,6 +6,8 @@ const API_URL = process.env.DATABASE_URL; // Use DATABASE_URL
 
 export async function GET() {
     const response = await fetch(`${API_URL}/notes`); // Get all notes
+    console.log('API_URL:', API_URL);
+
     const notes = await response.json();
     return NextResponse.json(notes);
 }

@@ -5,6 +5,8 @@ import { NextResponse } from 'next/server';
 const API_URL = process.env.DATABASE_URL; // Use DATABASE_URL
 
 export async function GET() {
+    console.log('API_URL:', API_URL);
+
     const response = await fetch(`${API_URL}/employees`); // Get all employees
     const employees = await response.json();
     return NextResponse.json(employees);
