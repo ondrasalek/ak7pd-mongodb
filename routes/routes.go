@@ -1,28 +1,29 @@
 package routes
 
 import (
-	"ak7pd/controllers"
+	"ak7pd/handlers"
 
 	"github.com/gorilla/mux"
 )
 
-// RegisterRoutes sets up the API routes for the application
-func RegisterRoutes() *mux.Router {
-    router := mux.NewRouter()
-
+func SetupRoutes(router *mux.Router) {
     // Notes Routes
-    router.HandleFunc("/api/notes", controllers.GetNotes).Methods("GET")
-    router.HandleFunc("/api/notes/{id}", controllers.GetNoteByID).Methods("GET")
-    router.HandleFunc("/api/notes", controllers.CreateNote).Methods("POST")
-    router.HandleFunc("/api/notes/{id}", controllers.UpdateNote).Methods("PUT")
-    router.HandleFunc("/api/notes/{id}", controllers.DeleteNote).Methods("DELETE")
+    notesGroup := router.PathPrefix("/api/notes").Subrouter()
+    {
+        notesGroup.HandleFunc("/", handlers.GetNotes).Methods("GET")
+        notesGroup.HandleFunc("/{id}", handlers.GetNoteByID).Methods("GET")
+        notesGroup.HandleFunc("/", handlers.CreateNote).Methods("POST")
+        notesGroup.HandleFunc("/{id}", handlers.UpdateNote).Methods("PUT")
+        notesGroup.HandleFunc("/{id}", handlers.DeleteNote).Methods("DELETE")
+    }
 
     // Users Routes
-    router.HandleFunc("/api/users", controllers.GetUsers).Methods("GET")
-    router.HandleFunc("/api/users/{id}", controllers.GetUserByID).Methods("GET")
-    router.HandleFunc("/api/users", controllers.CreateUser).Methods("POST")
-    router.HandleFunc("/api/users/{id}", controllers.UpdateUser).Methods("PUT")
-    router.HandleFunc("/api/users/{id}", controllers.DeleteUser).Methods("DELETE")
-
-    return router
+    usersGroup := router.PathPrefix("/api/users").Subrouter()
+    {
+        usersGroup.HandleFunc("/", handlers.GetUsers).Methods("GET")
+        usersGroup.HandleFunc("/{id}", handlers.GetUserByID).Methods("GET")
+        usersGroup.HandleFunc("/", handlers.CreateUser).Methods("POST")
+        usersGroup.HandleFunc("/{id}", handlers.UpdateUser).Methods("PUT")
+        usersGroup.HandleFunc("/{id}", handlers.DeleteUser).Methods("DELETE")
+    }
 }

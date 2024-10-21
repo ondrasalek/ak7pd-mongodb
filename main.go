@@ -4,11 +4,12 @@ import (
 	"log"
 	"net/http"
 
-	"ak7pd/controllers"
 	"ak7pd/database"
+	"ak7pd/handlers"
 	"ak7pd/routes"
 	"os"
 
+	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
 
@@ -28,12 +29,12 @@ func main() {
     client := database.ConnectDB(mongoURI)
 
     // Initialize collections
-    controllers.NotesCollection = database.GetCollection(client, "test", "notes")
-    controllers.UsersCollection = database.GetCollection(client, "test", "users")
+    handlers.NotesCollection = database.GetCollection(client, "test", "notes")
+    handlers.UsersCollection = database.GetCollection(client, "test", "users")
 
     // Register routes
-    router := routes.RegisterRoutes()
-
+    router := mux.NewRouter()
+    routes.SetupRoutes(router)
     // Start the server
-    log.Fatal(http.ListenAndServe(":8000", router))
+    log.Fatal(http.ListenAndServe(":8081", router))
 }
