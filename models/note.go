@@ -1,3 +1,4 @@
+// models/note.go
 package models
 
 import (
@@ -6,12 +7,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+// Note represents a note in the database
 type Note struct {
-    ID              primitive.ObjectID   `json:"id,omitempty" bson:"_id,omitempty"`
-    UserID          primitive.ObjectID   `json:"userId,omitempty" bson:"userId,omitempty"`
-    Title           string               `json:"title,omitempty" bson:"title,omitempty"`
-    Content         string               `json:"content,omitempty" bson:"content,omitempty"`
-    CreatedAt       time.Time            `json:"createdAt,omitempty" bson:"createdAt,omitempty"`
-    BusinessPosition string              `json:"businessPosition,omitempty" bson:"businessPosition,omitempty"`
-    Visibility      []string             `json:"visibility,omitempty" bson:"visibility,omitempty"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Title     string             `bson:"title" json:"title"`
+	Content   string             `bson:"content" json:"content"`
+	CreatedAt time.Time          `bson:"createdAt" json:"createdAt"`
 }

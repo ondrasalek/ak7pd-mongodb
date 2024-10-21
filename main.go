@@ -1,40 +1,25 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
 	"ak7pd/database"
 	"ak7pd/handlers"
 	"ak7pd/routes"
-	"os"
+	"log"
+	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 )
 
 func main() {
-    err := godotenv.Load()
-    if err != nil {
-        log.Fatal("Error loading .env file")
-    }
+	client := database.ConnectDB("your_mongodb_uri") // Ensure to replace with your actual URI
+	notesCollection := database.GetCollection(client, "your_db_name", "notes")
+	employeesCollection := database.GetCollection(client, "your_db_name", "employees")
 
-    // Get the MongoDB URI from the environment variables
-    mongoURI := os.Getenv("MONGODB_URI")
-    if mongoURI == "" {
-        log.Fatal("MONGODB_URI not set in .env")
-    }
+	handlers.NotesCollection = notesCollection
+	handlers.EmployeesCollection = employeesCollection
 
-    // Connect to MongoDB
-    client := database.ConnectDB(mongoURI)
+	router := mux.NewRouter()
+	routes.SetupRoutes(router)
 
-    // Initialize collections
-    handlers.NotesCollection = database.GetCollection(client, "test", "notes")
-    handlers.UsersCollection = database.GetCollection(client, "test", "users")
-
-    // Register routes
-    router := mux.NewRouter()
-    routes.SetupRoutes(router)
-    // Start the server
-    log.Fatal(http.ListenAndServe(":8081", router))
+	log.Fatal(http.ListenAndServe(":8000", router))
 }
