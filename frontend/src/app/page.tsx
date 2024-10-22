@@ -2,18 +2,20 @@
 'use client';
 
 import Search from '@/components/search/Search';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function Home() {
-    const fetchUrl = `${process.env.DATABASE_URL}/employees`;
-
     return (
-        <div>
-            <h1>Welcome to the Employee Management App</h1>
+        <div className='flex flex-col w-full'>
+            <div className='flex flex-row justify-between w-full'>
+                <h2 className='text-xl'>Employees</h2>
+                <Button variant='default' type='button'>
+                    <Link href='/employees/new'>New</Link>
+                </Button>
+            </div>
             <p>Select an employee to proceed.</p>
-            <Search type='employees' fetchUrl={fetchUrl} itemNameKey='name' />
-            <button onClick={() => (window.location.href = '/employee/new')}>
-                New
-            </button>
+            <Search type='employees' />
         </div>
     );
 }

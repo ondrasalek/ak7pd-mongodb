@@ -1,9 +1,11 @@
 export interface NoteInterface {
-    id: string; // MongoDB ObjectId will be a string in the frontend
+    id: string; // MongoDB ObjectId as string
     title: string;
     content: string;
-    userId: string; // MongoDB ObjectId of the user
-    createdAt: string; // Date in string format (ISO 8601)
+    createdAt: string; // ISO 8601 string format for dates
+    userId: string; // MongoDB ObjectId as string
+    businessPosition: string;
+    visibility: string;
 
-    [key: string]: string | undefined; // This allows indexing with any string key, where the value is a string or undefined
+    [key: string]: string | undefined; // To allow dynamic key access, values as string or undefined
 }

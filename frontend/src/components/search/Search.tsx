@@ -1,77 +1,114 @@
-import { useEffect, useState } from 'react';
-import { useCookies } from 'next-client-cookies';
 import { EmployeeInterface } from '@/lib/interfaces/EmployeeInterface';
 import { NoteInterface } from '@/lib/interfaces/NoteInterface';
 import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { useEmployees, useNotes } from '@/lib/fetchData';
+import { useState, useEffect } from 'react';
 
-interface SearchProps {
-    type: 'employees' | 'notes';
-    fetchUrl: string;
-    itemNameKey: string; // The key to display item name (for example, "name" for employees and "title" for notes)
-}
-
-const Search = ({ type, fetchUrl, itemNameKey }: SearchProps) => {
+const Search = ({ type }: { type: 'employees' | 'notes' }) => {
     const router = useRouter();
     const [items, setItems] = useState<EmployeeInterface[] | NoteInterface[]>(
         []
     );
     const [searchTerm, setSearchTerm] = useState('');
-    const cookies = useCookies();
-    const selectedItem = cookies.get('selectedItem');
+    const { employees, isLoading: employeesLoading } = useEmployees();
+    const { notes, isLoading: notesLoading } = useNotes();
 
     useEffect(() => {
-        async function fetchData() {
-            try {
-                const response = await fetch(fetchUrl);
-                const data = await response.json();
-                setItems(data);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
+        if (type === 'employees' && employees) {
+            setItems(employees);
+        } else if (type === 'notes' && notes) {
+            setItems(notes);
         }
+    }, [type, employees, notes]);
 
-        fetchData();
-    }, [fetchUrl, cookies, itemNameKey]);
-
+    // Handle search input change
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     };
 
-    const handleSelectItem = (item: EmployeeInterface | NoteInterface) => {
+    // Filter items based on search term
+    const filteredItems = items.filter((item) => {
         if (type === 'employees') {
-            cookies.set('selectedItem', item.id, { path: '/' });
+            return (item as EmployeeInterface).name
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase());
+        } else {
+            const note = item as NoteInterface;
+            return (
+                note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                note.content.toLowerCase().includes(searchTerm.toLowerCase())
+            );
         }
-        router.push(`/${type}/${item.id}`);
+    });
+
+    // Handle item selection and navigation
+    const handleSelectItem = (id: string) => {
+        router.push(`/${type}/${id}`);
     };
 
-    const filteredItems = items.filter((item) =>
-        item[itemNameKey]?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Add a loading state while data is being fetched
+    if (
+        (type === 'employees' && employeesLoading) ||
+        (type === 'notes' && notesLoading)
+    ) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div>
-            <input
+            <Input
                 type='text'
                 placeholder={`Search ${type}...`}
                 value={searchTerm}
                 onChange={handleSearch}
-                className='border p-2 mb-2'
+                className='mb-4'
             />
-            <ul>
-                {filteredItems.map((item) => (
-                    <li key={item.id}>
-                        <button
-                            onClick={() => handleSelectItem(item)}
-                            className={
-                                'p-2 border block w-full text-left ' +
-                                (item.id === selectedItem ? 'bg-gray-200' : '')
-                            }
-                        >
-                            {item[itemNameKey]}
-                        </button>
-                    </li>
-                ))}
-            </ul>
+
+            <Table className='w-full'>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>
+                            {type === 'employees' ? 'Name' : 'Title'}
+                        </TableHead>
+                        {type === 'notes' && <TableHead>Content</TableHead>}
+                        <TableHead>Actions</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {filteredItems.map((item) => (
+                        <TableRow key={item.id}>
+                            <TableCell>
+                                {type === 'employees'
+                                    ? (item as EmployeeInterface).name
+                                    : (item as NoteInterface).title}
+                            </TableCell>
+                            {type === 'notes' && (
+                                <TableCell>
+                                    {(item as NoteInterface).content}
+                                </TableCell>
+                            )}
+                            <TableCell>
+                                <Button
+                                    variant='outline'
+                                    onClick={() => handleSelectItem(item.id)}
+                                >
+                                    View Details
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
         </div>
     );
 };
