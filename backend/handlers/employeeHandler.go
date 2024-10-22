@@ -1,20 +1,17 @@
 package handlers
 
 import (
+	"ak7pd/database"
+	"ak7pd/models"
 	"context"
 	"encoding/json"
 	"net/http"
 	"time"
 
-	"ak7pd/models"
-
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
-
-var EmployeesCollection *mongo.Collection
 
 // GetEmployees retrieves all employees
 func GetEmployees(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +21,7 @@ func GetEmployees(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	cursor, err := EmployeesCollection.Find(ctx, bson.M{})
+	cursor, err := database.EmployeesCollection().Find(ctx, bson.M{})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -40,17 +37,16 @@ func GetEmployees(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(employees)
 }
 
-// GetEmployeeByID retrieves an employee by ID
+// GetEmployeeById retrieves employees by their id
 func GetEmployeeByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
 	id, _ := primitive.ObjectIDFromHex(params["id"])
-
 	var employee models.Employee
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	err := EmployeesCollection.FindOne(ctx, bson.M{"_id": id}).Decode(&employee)
+	err := database.EmployeesCollection().FindOne(ctx, bson.M{"_id": id}).Decode(&employee)
 	if err != nil {
 		http.Error(w, "Employee not found", http.StatusNotFound)
 		return
@@ -58,6 +54,7 @@ func GetEmployeeByID(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(employee)
 }
+
 
 // CreateEmployee creates a new employee
 func CreateEmployee(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +68,7 @@ func CreateEmployee(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	result, err := EmployeesCollection.InsertOne(ctx, employee)
+	result, err := database.EmployeesCollection().InsertOne(ctx, employee)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -92,7 +89,7 @@ func UpdateEmployee(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	result, err := EmployeesCollection.ReplaceOne(ctx, bson.M{"_id": id}, employee)
+	result, err := database.EmployeesCollection().ReplaceOne(ctx, bson.M{"_id": id}, employee)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -110,7 +107,7 @@ func DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	result, err := EmployeesCollection.DeleteOne(ctx, bson.M{"_id": id})
+	result, err := database.EmployeesCollection().DeleteOne(ctx, bson.M{"_id": id})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

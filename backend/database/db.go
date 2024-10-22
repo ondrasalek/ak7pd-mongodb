@@ -9,7 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var MongoClient *mongo.Client
+var (
+    MongoClient          *mongo.Client
+    notesCollection      *mongo.Collection
+    employeesCollection   *mongo.Collection
+)
 
 // ConnectDB initializes a MongoDB client and connects to the database
 func ConnectDB(uri string) *mongo.Client {
@@ -35,6 +39,21 @@ func ConnectDB(uri string) *mongo.Client {
 }
 
 // GetCollection is a helper to return a MongoDB collection from a specific database
-func GetCollection(client *mongo.Client, dbName string, collectionName string) *mongo.Collection {
-    return client.Database(dbName).Collection(collectionName)
+func GetCollection(dbName string, collectionName string) *mongo.Collection {
+    return MongoClient.Database(dbName).Collection(collectionName)
+}
+
+// InitializeCollections initializes the collections you will be using
+func InitializeCollections() {
+    notesCollection = GetCollection("ak7pd", "notes")
+    employeesCollection = GetCollection("ak7pd", "employees")
+}
+
+// Optional: Provide access to collections outside this package
+func NotesCollection() *mongo.Collection {
+    return notesCollection
+}
+
+func EmployeesCollection() *mongo.Collection {
+    return employeesCollection
 }
