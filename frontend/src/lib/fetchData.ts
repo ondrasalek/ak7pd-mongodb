@@ -6,6 +6,11 @@ import useSWR from 'swr';
 
 const fetcher = async (url: string) => {
     const response = await fetch(url);
+    if (!response.ok) {
+        // If the response is not ok, attempt to read the error message
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'An error occurred');
+    }
     const data = await response.json();
     return data;
 };
@@ -27,12 +32,11 @@ export function useEmployees() {
     };
 }
 
-export function useNotes() {
+export function useNotes(userId: string | undefined) {
     const { data, error, isLoading } = useSWR(
-        `${process.env.DATABASE_URL}/notes`, // Fix typo here
+        `${process.env.DATABASE_URL}/notes${userId ? `/user/${userId}` : ''}`,
         fetcher
     );
-
     if (error) {
         console.error(error);
     }
@@ -49,7 +53,6 @@ export function useEmployee(id: string) {
         `${process.env.DATABASE_URL}/employees/${id}`, // Fix typo here
         fetcher
     );
-    console.log(data);
 
     if (error) {
         console.error(error);

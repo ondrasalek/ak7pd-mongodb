@@ -1,64 +1,29 @@
 'use client';
-import { useEffect, useState } from 'react';
 import { NoteInterface } from '@/lib/interfaces/NoteInterface';
+import NoteCard from '@/components/note/Card';
+import { useNote } from '@/lib/fetchData';
+import { useParams } from 'next/navigation'; // New approach if required
 
-export default function NoteDetailsPage({
-    params,
-}: {
-    params: { id: string }; // Change to id
-}) {
-    const id = params.id;
-    const [note, setNote] = useState<NoteInterface | null>(null);
-    const [loading, setLoading] = useState(true);
+export default function NoteDetailsPage() {
+    const params = useParams(); // Using useParams to get params
+    const { id } = params as { id: string }; // Type assertion
+    const { note, isLoading, isError } = useNote(id) as {
+        note: NoteInterface | undefined;
+        isLoading: boolean;
+        isError: boolean;
+    };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(
-                    `${process.env.DATABASE_URL}/notes/${id}`, // Fetch note by ID or title (if applicable)
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error('Note not found');
-                }
-
-                const data = await response.json();
-                setNote(data);
-            } catch (error) {
-                console.error('Error fetching note:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, [id]);
-
-    if (loading) {
+    // Loading state
+    if (isLoading) {
         return <p>Loading note details...</p>;
     }
 
-    if (!note) {
-        return <p>Note not found</p>;
+    // Error state
+    if (isError || !note) {
+        return (
+            <p>Note not found or there was an error fetching the details.</p>
+        );
     }
 
-    return (
-        <div>
-            <h1>{note.title}</h1>
-            <p>{note.content}</p>
-            <p>
-                <strong>Created At:</strong>{' '}
-                {new Date(note.createdAt).toLocaleString()}
-            </p>
-            <p>
-                User ID: <strong>{note.userId}</strong>
-            </p>
-        </div>
-    );
+    return <NoteCard data={note} />;
 }

@@ -47,7 +47,7 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground w-full container mx-auto;
+    @apply bg-background text-foreground w-full container mx-auto p-1;
   }
   main{
     @apply p-4;
