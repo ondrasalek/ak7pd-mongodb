@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { CookiesProvider } from 'next-client-cookies/server';
+import Header from '@/components/layout/header/Header';
 
 export const metadata: Metadata = {
     title: 'AK7PD MongoDB',
@@ -13,7 +15,12 @@ export default function RootLayout({
 }>) {
     return (
         <html lang='en'>
-            <body>{children}</body>
+            <CookiesProvider>
+                <body>
+                    <Header />
+                    <main>{children}</main>
+                </body>
+            </CookiesProvider>
         </html>
     );
 }
