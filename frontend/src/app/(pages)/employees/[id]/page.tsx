@@ -5,6 +5,8 @@ import EmployeeCard from '@/components/employee/Card';
 import { useEmployee } from '@/lib/fetchData';
 import { Card, CardTitle } from '@/components/ui/card';
 import { useParams } from 'next/navigation'; // New approach if required
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function EmployeeDetailsPage() {
     const params = useParams(); // Using useParams to get params
@@ -30,8 +32,11 @@ export default function EmployeeDetailsPage() {
     }
 
     return (
-        <div className='flex-col space-y-5'>
+        <div className='flex-col space-y-5 w-full'>
             <EmployeeCard data={employee} />
+            <Button variant='default'>
+                <Link href={`/notes/new?userId=${employee.id}`}>New Note</Link>
+            </Button>
             <Card>
                 <CardTitle className='p-4'>Notes</CardTitle>
                 <NotesSearch userId={employee.id} />

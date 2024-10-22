@@ -14,7 +14,7 @@ func SetupRoutes(router *mux.Router) {
 		notesGroup.HandleFunc("/", handlers.GetNotes).Methods("GET")
 		notesGroup.HandleFunc("/{id}", handlers.GetNoteByID).Methods("GET")
 		notesGroup.HandleFunc("/user/{userId}", handlers.GetNotesByUserID).Methods("GET")
-		notesGroup.HandleFunc("/", handlers.CreateNote).Methods("POST")
+		notesGroup.HandleFunc("/new", handlers.CreateNote).Methods("POST")
 		notesGroup.HandleFunc("/{id}", handlers.UpdateNote).Methods("PUT")
 		notesGroup.HandleFunc("/{id}", handlers.DeleteNote).Methods("DELETE")
 	}
@@ -25,7 +25,7 @@ func SetupRoutes(router *mux.Router) {
 		employeesGroup.HandleFunc("", handlers.GetEmployees).Methods("GET")
 		employeesGroup.HandleFunc("/", handlers.GetEmployees).Methods("GET")
 		employeesGroup.HandleFunc("/{id}", handlers.GetEmployeeByID).Methods("GET")
-		employeesGroup.HandleFunc("/", handlers.CreateEmployee).Methods("POST")
+		employeesGroup.HandleFunc("/new", handlers.CreateEmployee).Methods("POST")
 		employeesGroup.HandleFunc("/{id}", handlers.UpdateEmployee).Methods("PUT")
 		employeesGroup.HandleFunc("/{id}", handlers.DeleteEmployee).Methods("DELETE")
 	}

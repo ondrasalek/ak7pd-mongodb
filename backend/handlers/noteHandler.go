@@ -97,58 +97,69 @@ func GetNotesByUserID(w http.ResponseWriter, r *http.Request) {
 
 
 func CreateNote(w http.ResponseWriter, r *http.Request) {
-    w.Header().Set("Content-Type", "application/json")
-
     var note models.Note
-    _ = json.NewDecoder(r.Body).Decode(&note)
-    note.ID = primitive.NewObjectID()
+    err := json.NewDecoder(r.Body).Decode(&note)
+    if err != nil {
+        http.Error(w, "Invalid input", http.StatusBadRequest)
+        return
+    }
+
+    // Validate userId
+    if note.UserId.IsZero() {
+        http.Error(w, "User ID is required", http.StatusBadRequest)
+        return
+    }
+
+    // Insert the note into the database
     note.CreatedAt = time.Now()
-
-    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-    defer cancel()
-
-    result, err := database.NotesCollection().InsertOne(ctx, note)
+    _, err = database.NotesCollection().InsertOne(context.Background(), note)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
 
-    json.NewEncoder(w).Encode(result)
+    w.WriteHeader(http.StatusCreated)
+    json.NewEncoder(w).Encode(note)
 }
+
 
 func UpdateNote(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-	id, _ := primitive.ObjectIDFromHex(params["id"])
+    params := mux.Vars(r)
+    id, _ := primitive.ObjectIDFromHex(params["id"])
 
-	var note models.Note
-	_ = json.NewDecoder(r.Body).Decode(&note)
+    var updatedNote models.Note
+    err := json.NewDecoder(r.Body).Decode(&updatedNote)
+    if err != nil {
+        http.Error(w, "Invalid input", http.StatusBadRequest)
+        return
+    }
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+    // Update the note in the database
+    _, err = database.NotesCollection().UpdateOne(
+        context.Background(),
+        bson.M{"_id": id},
+        bson.M{"$set": updatedNote},
+    )
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
 
-	result, err := database.NotesCollection().ReplaceOne(ctx, bson.M{"_id": id}, note)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	json.NewEncoder(w).Encode(result)
+    w.WriteHeader(http.StatusOK)
+    json.NewEncoder(w).Encode(updatedNote)
 }
 
+
 func DeleteNote(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-	id, _ := primitive.ObjectIDFromHex(params["id"])
+    params := mux.Vars(r)
+    id, _ := primitive.ObjectIDFromHex(params["id"])
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+    // Delete the note from the database
+    _, err := database.NotesCollection().DeleteOne(context.Background(), bson.M{"_id": id})
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
 
-	result, err := database.NotesCollection().DeleteOne(ctx, bson.M{"_id": id})
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	json.NewEncoder(w).Encode(result)
+    w.WriteHeader(http.StatusNoContent)
 }

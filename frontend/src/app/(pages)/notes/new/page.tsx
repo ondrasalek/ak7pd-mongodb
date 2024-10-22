@@ -1,5 +1,12 @@
 'use client';
 
+import CreateNoteForm from '@/components/note/CreateNoteForm';
+
 export default function NotesNewPages() {
-    return <div>TODO</div>;
+    return (
+        <>
+            <h1>Create a New Note</h1>
+            <CreateNoteForm />
+        </>
+    );
 }
