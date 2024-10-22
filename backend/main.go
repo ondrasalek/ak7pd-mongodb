@@ -11,6 +11,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -36,5 +37,14 @@ func main() {
 	router := mux.NewRouter()
 	routes.SetupRoutes(router)
 
-	log.Fatal(http.ListenAndServe(":8081", router))
+	c := cors.New(cors.Options{
+        AllowedOrigins:   []string{"http://localhost:3000"}, // Frontend origin
+        AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+        AllowedHeaders:   []string{"Content-Type", "Authorization"},
+        AllowCredentials: true,
+    })
+    handler := c.Handler(router)
+
+    log.Println("Starting server on :8080")
+    log.Fatal(http.ListenAndServe(":8080", handler))
 }
