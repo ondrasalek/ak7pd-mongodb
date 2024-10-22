@@ -56,6 +56,46 @@ func GetNoteByID(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(note)
 }
 
+func GetNotesByUserID(w http.ResponseWriter, r *http.Request) {
+    w.Header().Set("Content-Type", "application/json")
+    params := mux.Vars(r)
+
+    userId, err := primitive.ObjectIDFromHex(params["userId"])
+    if err != nil {
+        w.WriteHeader(http.StatusBadRequest)
+        json.NewEncoder(w).Encode(map[string]string{"error": "Invalid userId"})
+        return
+    }
+
+    var notes []models.Note
+    ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+    defer cancel()
+
+    cursor, err := database.NotesCollection().Find(ctx, bson.M{"userId": userId})
+    if err != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+        json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
+        return
+    }
+    defer cursor.Close(ctx)
+
+    for cursor.Next(ctx) {
+        var note models.Note
+        cursor.Decode(&note)
+        notes = append(notes, note)
+    }
+
+    // Check if notes slice is empty and return an appropriate response
+    if len(notes) == 0 {
+        w.WriteHeader(http.StatusNotFound)
+        json.NewEncoder(w).Encode(map[string]string{"error": "No notes found for the specified userId"})
+        return
+    }
+
+    json.NewEncoder(w).Encode(notes)
+}
+
+
 func CreateNote(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 

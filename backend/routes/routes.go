@@ -13,6 +13,7 @@ func SetupRoutes(router *mux.Router) {
 		notesGroup.HandleFunc("", handlers.GetNotes).Methods("GET")
 		notesGroup.HandleFunc("/", handlers.GetNotes).Methods("GET")
 		notesGroup.HandleFunc("/{id}", handlers.GetNoteByID).Methods("GET")
+		notesGroup.HandleFunc("/user/{userId}", handlers.GetNotesByUserID).Methods("GET")
 		notesGroup.HandleFunc("/", handlers.CreateNote).Methods("POST")
 		notesGroup.HandleFunc("/{id}", handlers.UpdateNote).Methods("PUT")
 		notesGroup.HandleFunc("/{id}", handlers.DeleteNote).Methods("DELETE")
