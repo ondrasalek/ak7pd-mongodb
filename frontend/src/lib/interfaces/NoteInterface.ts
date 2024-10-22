@@ -1,3 +1,6 @@
+import { BusinessPosition } from '@/lib/types/BusinessPositionType';
+import { Visibility } from '@/lib/types/VisibilityType';
+
 export interface NoteInterface {
     id: string; // MongoDB ObjectId as string
     title: string;
@@ -18,15 +21,3 @@ export interface CreateNoteInput {
     businessPosition: BusinessPosition;
     visibility: Visibility;
 }
-
-// Type for business positions
-export type BusinessPosition =
-    | 'Developer'
-    | 'Manager'
-    | 'Designer'
-    | 'QA'
-    | 'DevOps'
-    | 'Other';
-
-// Type for visibility options
-export type Visibility = 'Public' | 'Private';

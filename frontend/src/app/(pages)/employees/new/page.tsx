@@ -1,5 +1,12 @@
 'use client';
 
+import CreateEmployeeForm from '@/components/employee/CreateEmployeeForm';
+
 export default function EmployeesNewPages() {
-    return <div>TODO</div>;
+    return (
+        <>
+            <h1>Create a new employee</h1>
+            <CreateEmployeeForm />
+        </>
+    );
 }

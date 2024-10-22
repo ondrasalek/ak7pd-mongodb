@@ -33,6 +33,11 @@ const businessPositions = [
     'Designer',
     'QA',
     'DevOps',
+    'Engineering',
+    'Marketing',
+    'Sales',
+    'HR',
+    'Finance',
     'Other',
 ] as const;
 const visibilityOptions = ['Public', 'Private'] as const;

@@ -1,6 +1,9 @@
 'use client';
 
-import { EmployeeInterface } from './interfaces/EmployeeInterface';
+import {
+    EmployeeInterface,
+    CreateEmployeeInput,
+} from './interfaces/EmployeeInterface';
 import { NoteInterface, CreateNoteInput } from './interfaces/NoteInterface';
 import useSWR from 'swr';
 
@@ -50,6 +53,24 @@ export function useEmployee(id: string) {
     };
 }
 
+export async function createEmployee(employeeData: CreateEmployeeInput) {
+    const response = await fetch(`${process.env.DATABASE_URL}/employees/new`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: employeeData.name,
+            position: employeeData.position,
+            department: employeeData.department,
+        }),
+    });
+    if (!response.ok) {
+        throw new Error('Failed to create employee');
+    }
+    return response.json();
+}
+
 // Notes
 export function useNotes(userId: string | undefined) {
     const { data, error, isLoading } = useSWR(
@@ -92,11 +113,9 @@ export async function createNote(noteData: CreateNoteInput) {
         },
         body: JSON.stringify(noteData),
     });
-    console.log('response', response);
     if (!response.ok) {
         throw new Error('Failed to create note');
     }
-
     return response.json();
 }
 // Function to update an existing note

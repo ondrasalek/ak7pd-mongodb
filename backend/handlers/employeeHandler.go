@@ -56,26 +56,26 @@ func GetEmployeeByID(w http.ResponseWriter, r *http.Request) {
 }
 
 
-// CreateEmployee creates a new employee
 func CreateEmployee(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	var employee models.Employee
-	_ = json.NewDecoder(r.Body).Decode(&employee)
-	employee.ID = primitive.NewObjectID()
+	err := json.NewDecoder(r.Body).Decode(&employee)
+    if err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+        return
+    }
+    // Insert the employee into the database
 	employee.CreatedAt = time.Now()
+    _, err = database.EmployeesCollection().InsertOne(context.Background(), employee)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	result, err := database.EmployeesCollection().InsertOne(ctx, employee)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	json.NewEncoder(w).Encode(result)
+    w.WriteHeader(http.StatusCreated)
+    json.NewEncoder(w).Encode(employee)
 }
+
+
 
 // UpdateEmployee updates an existing employee
 func UpdateEmployee(w http.ResponseWriter, r *http.Request) {
