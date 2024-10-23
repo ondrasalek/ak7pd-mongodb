@@ -13,12 +13,15 @@ import {
 } from '@/components/ui/table';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Alert } from '@/components/ui/alert';
 
 const NotesSearch = ({ userId = undefined }: { userId?: string }) => {
     const router = useRouter();
     const { notes, isLoading } = useNotes(userId);
     const [searchTerm, setSearchTerm] = useState('');
-
+    if (notes === undefined) {
+        return <Alert>Nothing to show</Alert>;
+    }
     const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     };

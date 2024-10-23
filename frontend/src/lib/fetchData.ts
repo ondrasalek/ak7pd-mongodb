@@ -1,5 +1,3 @@
-'use client';
-
 import {
     EmployeeInterface,
     CreateEmployeeInput,
@@ -71,16 +69,26 @@ export async function createEmployee(employeeData: CreateEmployeeInput) {
     return response.json();
 }
 
+export function deleteEmployee(id: string) {
+    return fetch(`${process.env.DATABASE_URL}/employees/${id}`, {
+        method: 'DELETE',
+    });
+}
 // Notes
 export function useNotes(userId: string | undefined) {
     const { data, error, isLoading } = useSWR(
         `${process.env.DATABASE_URL}/notes${userId ? `/user/${userId}` : ''}`,
         fetcher
     );
-    if (error) {
+    if (error && data === undefined) {
+        return {
+            notes: undefined,
+            isLoading,
+            isError: error,
+        };
+    } else if (error) {
         console.error(error);
     }
-
     return {
         notes: data as NoteInterface[],
         isLoading,
@@ -138,12 +146,8 @@ export async function updateNote(
     return response.json();
 }
 // Function to delete a note
-export async function deleteNote(id: string): Promise<void> {
-    const response = await fetch(`${process.env.DATABASE_URL}/notes/${id}`, {
+export function deleteNote(id: string) {
+    fetch(`${process.env.DATABASE_URL}/notes/${id}`, {
         method: 'DELETE',
     });
-
-    if (!response.ok) {
-        throw new Error('Error deleting note');
-    }
 }
