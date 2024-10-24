@@ -94,44 +94,45 @@ const NotesSearch = ({ userId = undefined }: { userId?: string }) => {
                     className='w-full sm:w-auto w-min-fit'
                 />
             </div>
-
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className='w-[300px]'>Title</TableHead>
-                        <TableHead className='w-fit'>Content</TableHead>
-                        <TableHead>
-                            <Button
-                                variant='ghost'
-                                onClick={handleSort}
-                                className='hover:bg-transparent'
-                            >
-                                Created
-                                <ArrowUpDown className='ml-2 h-4 w-4' />
-                            </Button>
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {filteredAndSortedNotes?.map((note) => (
-                        <TableRow
-                            key={note.id}
-                            className='cursor-pointer'
-                            onClick={() => {
-                                handleSelectItem(note.id);
-                            }}
-                        >
-                            <TableCell className='font-medium'>
-                                {note.title}
-                            </TableCell>
-                            <TableCell>{note.content}</TableCell>
-                            <TableCell>
-                                {formatDateTime(note.createdAt)}
-                            </TableCell>
+            <div className='rounded-md border'>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className='w-[300px]'>Title</TableHead>
+                            <TableHead className='w-fit'>Content</TableHead>
+                            <TableHead>
+                                <Button
+                                    variant='ghost'
+                                    onClick={handleSort}
+                                    className='hover:bg-transparent'
+                                >
+                                    Created
+                                    <ArrowUpDown className='ml-2 h-4 w-4' />
+                                </Button>
+                            </TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {filteredAndSortedNotes?.map((note) => (
+                            <TableRow
+                                key={note.id}
+                                className='cursor-pointer'
+                                onClick={() => {
+                                    handleSelectItem(note.id);
+                                }}
+                            >
+                                <TableCell className='font-medium'>
+                                    {note.title}
+                                </TableCell>
+                                <TableCell>{note.content}</TableCell>
+                                <TableCell>
+                                    {formatDateTime(note.createdAt)}
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     );
 };
