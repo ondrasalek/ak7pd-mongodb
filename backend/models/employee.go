@@ -13,4 +13,5 @@ type Employee struct {
 	Position  string             `bson:"position" json:"position"`
 	Department string            `bson:"department" json:"department"`
 	CreatedAt time.Time          `bson:"createdAt" json:"createdAt"`
+	UpdatedAt time.Time          `bson:"updatedAt" json:"updatedAt"`
 }

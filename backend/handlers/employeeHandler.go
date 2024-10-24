@@ -65,6 +65,7 @@ func CreateEmployee(w http.ResponseWriter, r *http.Request) {
     }
     // Insert the employee into the database
 	employee.CreatedAt = time.Now()
+	employee.UpdatedAt = employee.CreatedAt
     _, err = database.EmployeesCollection().InsertOne(context.Background(), employee)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -75,27 +76,45 @@ func CreateEmployee(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(employee)
 }
 
-
-
 // UpdateEmployee updates an existing employee
 func UpdateEmployee(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	params := mux.Vars(r)
-	id, _ := primitive.ObjectIDFromHex(params["id"])
+	id, err := primitive.ObjectIDFromHex(params["id"])
+	if err != nil {
+		http.Error(w, "Invalid employee ID", http.StatusBadRequest)
+		return
+	}
 
-	var employee models.Employee
-	_ = json.NewDecoder(r.Body).Decode(&employee)
+	var updatedEmployee models.Employee
+	err = json.NewDecoder(r.Body).Decode(&updatedEmployee)
+	if err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
+	// Set the updatedAt field to the current time
+	updatedEmployee.UpdatedAt = time.Now()
 
-	result, err := database.EmployeesCollection().ReplaceOne(ctx, bson.M{"_id": id}, employee)
+	// Only update specific fields
+	update := bson.M{
+		"name":      updatedEmployee.Name,
+		"position":  updatedEmployee.Position,
+		"department": updatedEmployee.Department,
+		"updatedAt": updatedEmployee.UpdatedAt,
+	}
+
+	_, err = database.EmployeesCollection().UpdateOne(
+		context.Background(),
+		bson.M{"_id": id},
+		bson.M{"$set": update},  // Only updating specific fields
+	)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	json.NewEncoder(w).Encode(result)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(updatedEmployee)
 }
 
 // DeleteEmployee deletes an employee by ID
@@ -113,5 +132,12 @@ func DeleteEmployee(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// delete all notes associated with the employee
+	_, err = database.NotesCollection().DeleteMany(ctx, bson.M{"userId": id})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	
 	json.NewEncoder(w).Encode(result)
 }

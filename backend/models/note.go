@@ -13,6 +13,7 @@ type Note struct {
 	Title        string             `bson:"title" json:"title"`
 	Content      string             `bson:"content" json:"content"`
 	CreatedAt    time.Time          `bson:"createdAt" json:"createdAt"`
+	UpdatedAt time.Time          `bson:"updatedAt" json:"updatedAt"`
 	UserId          primitive.ObjectID  `bson:"userId" json:"userId"`
 	BusinessPosition string        `bson:"businessPosition" json:"businessPosition"`
 	Visibility   string             `bson:"visibility" json:"visibility"`

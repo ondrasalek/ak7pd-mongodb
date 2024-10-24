@@ -112,6 +112,7 @@ func CreateNote(w http.ResponseWriter, r *http.Request) {
 
     // Insert the note into the database
     note.CreatedAt = time.Now()
+    note.UpdatedAt = note.CreatedAt
     _, err = database.NotesCollection().InsertOne(context.Background(), note)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -125,21 +126,32 @@ func CreateNote(w http.ResponseWriter, r *http.Request) {
 
 func UpdateNote(w http.ResponseWriter, r *http.Request) {
     params := mux.Vars(r)
-    id, _ := primitive.ObjectIDFromHex(params["id"])
+	id, err := primitive.ObjectIDFromHex(params["id"])
+	if err != nil {
+		http.Error(w, "Invalid employee ID", http.StatusBadRequest)
+		return
+	}
 
     var updatedNote models.Note
-    err := json.NewDecoder(r.Body).Decode(&updatedNote)
-    if err != nil {
-        http.Error(w, "Invalid input", http.StatusBadRequest)
-        return
-    }
-
+    err = json.NewDecoder(r.Body).Decode(&updatedNote)
+	if err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+	updatedNote.UpdatedAt = time.Now()
+    update := bson.M{
+        "title": updatedNote.Title,
+        "content": updatedNote.Content,
+        "visibility": updatedNote.Visibility,
+        "businessPosition": updatedNote.BusinessPosition,
+		"updatedAt": updatedNote.UpdatedAt,
+	}
     // Update the note in the database
     _, err = database.NotesCollection().UpdateOne(
-        context.Background(),
-        bson.M{"_id": id},
-        bson.M{"$set": updatedNote},
-    )
+		context.Background(),
+		bson.M{"_id": id},
+		bson.M{"$set": update},  // Only updating specific fields
+	)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
