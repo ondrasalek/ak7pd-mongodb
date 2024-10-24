@@ -83,7 +83,7 @@ const EmployeeSearch = () => {
 
     return (
         <div className='space-y-4'>
-            <div className='flex flex-col sm:flex-row gap-4 justify-between'>
+            <div className='flex flex-col sm:flex-row gap-4 '>
                 <Input
                     type='text'
                     placeholder='Search employees...'
@@ -114,30 +114,20 @@ const EmployeeSearch = () => {
                                     <ArrowUpDown className='ml-2 h-4 w-4' />
                                 </Button>
                             </TableHead>
-                            <TableHead className='text-right'>
-                                Actions
-                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredAndSortedEmployees?.map((employee) => (
-                            <TableRow key={employee.id}>
+                            <TableRow
+                                key={employee.id}
+                                onClick={() => handleSelectItem(employee.id)}
+                                className='cursor-pointer'
+                            >
                                 <TableCell className='font-medium'>
                                     {employee.name}
                                 </TableCell>
                                 <TableCell>
                                     {formatDateTime(employee.createdAt)}
-                                </TableCell>
-                                <TableCell className='text-right'>
-                                    <Button
-                                        variant='outline'
-                                        size='sm'
-                                        onClick={() =>
-                                            handleSelectItem(employee.id)
-                                        }
-                                    >
-                                        View
-                                    </Button>
                                 </TableCell>
                             </TableRow>
                         ))}

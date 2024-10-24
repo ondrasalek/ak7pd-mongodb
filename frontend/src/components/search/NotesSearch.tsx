@@ -79,7 +79,7 @@ const NotesSearch = ({ userId = undefined }: { userId?: string }) => {
     }
     return (
         <div className='space-y-4'>
-            <div className='flex flex-col sm:flex-row gap-4 justify-between'>
+            <div className='flex flex-col sm:flex-row gap-4 '>
                 <Input
                     type='text'
                     placeholder='Search notes...'
@@ -110,28 +110,23 @@ const NotesSearch = ({ userId = undefined }: { userId?: string }) => {
                                 <ArrowUpDown className='ml-2 h-4 w-4' />
                             </Button>
                         </TableHead>
-                        <TableHead className='text-right'>Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {filteredAndSortedNotes?.map((note) => (
-                        <TableRow key={note.id}>
+                        <TableRow
+                            key={note.id}
+                            className='cursor-pointer'
+                            onClick={() => {
+                                handleSelectItem(note.id);
+                            }}
+                        >
                             <TableCell className='font-medium'>
                                 {note.title}
                             </TableCell>
                             <TableCell>{note.content}</TableCell>
                             <TableCell>
                                 {formatDateTime(note.createdAt)}
-                            </TableCell>
-                            <TableCell className='text-right'>
-                                <Button
-                                    variant='outline'
-                                    onClick={() => {
-                                        handleSelectItem(note.id);
-                                    }}
-                                >
-                                    View Details
-                                </Button>
                             </TableCell>
                         </TableRow>
                     ))}
