@@ -1,8 +1,8 @@
 import {
     EmployeeInterface,
-    CreateEmployeeInput,
+    EmployeeInput,
 } from './interfaces/EmployeeInterface';
-import { NoteInterface, CreateNoteInput } from './interfaces/NoteInterface';
+import { NoteInterface, NoteInput } from './interfaces/NoteInterface';
 import useSWR from 'swr';
 
 const fetcher = async (url: string) => {
@@ -22,8 +22,13 @@ export function useEmployees() {
         `${process.env.DATABASE_URL}/employees`, // Fix typo here
         fetcher
     );
-
-    if (error) {
+    if (error && data === undefined) {
+        return {
+            employees: undefined,
+            isLoading,
+            isError: error,
+        };
+    } else if (error) {
         console.error(error);
     }
 
@@ -51,7 +56,7 @@ export function useEmployee(id: string) {
     };
 }
 
-export async function createEmployee(employeeData: CreateEmployeeInput) {
+export async function createEmployee(employeeData: EmployeeInput) {
     const response = await fetch(`${process.env.DATABASE_URL}/employees/new`, {
         method: 'POST',
         headers: {
@@ -66,9 +71,35 @@ export async function createEmployee(employeeData: CreateEmployeeInput) {
     if (!response.ok) {
         throw new Error('Failed to create employee');
     }
+
     return response.json();
 }
 
+export async function updateEmployee(
+    id: string,
+    updatedEmployee: EmployeeInput
+) {
+    const response = await fetch(
+        `${process.env.DATABASE_URL}/employees/${id}`,
+        {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: updatedEmployee.name,
+                position: updatedEmployee.position,
+                department: updatedEmployee.department,
+            }),
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error('Error updating employee');
+    }
+
+    return response.json();
+}
 export function deleteEmployee(id: string) {
     return fetch(`${process.env.DATABASE_URL}/employees/${id}`, {
         method: 'DELETE',
@@ -113,7 +144,7 @@ export function useNote(id: string) {
     };
 }
 
-export async function createNote(noteData: CreateNoteInput) {
+export async function createNote(noteData: NoteInput) {
     const response = await fetch(`${process.env.DATABASE_URL}/notes/new`, {
         method: 'POST',
         headers: {
@@ -127,16 +158,13 @@ export async function createNote(noteData: CreateNoteInput) {
     return response.json();
 }
 // Function to update an existing note
-export async function updateNote(
-    id: string,
-    updatedNote: Partial<NoteInterface>
-): Promise<NoteInterface> {
+export async function updateNote(id: string, data: NoteInput) {
     const response = await fetch(`${process.env.DATABASE_URL}/notes/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedNote),
+        body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -145,6 +173,7 @@ export async function updateNote(
 
     return response.json();
 }
+
 // Function to delete a note
 export function deleteNote(id: string) {
     fetch(`${process.env.DATABASE_URL}/notes/${id}`, {

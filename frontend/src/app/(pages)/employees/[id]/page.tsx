@@ -1,12 +1,11 @@
 'use client';
 import { EmployeeInterface } from '@/lib/interfaces/EmployeeInterface';
 import NotesSearch from '@/components/search/NotesSearch';
-import EmployeeCard from '@/components/employee/Card';
+import EmployeeCard from '@/components/cards/EmployeeCard';
 import { useEmployee, deleteEmployee } from '@/lib/fetchData';
 import { Card, CardTitle } from '@/components/ui/card';
-import { useParams } from 'next/navigation'; // New approach if required
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Edit, Trash2, Plus } from 'lucide-react';
 
 export default function EmployeeDetailsPage() {

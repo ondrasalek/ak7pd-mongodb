@@ -1,6 +1,6 @@
 'use client';
 import { NoteInterface } from '@/lib/interfaces/NoteInterface';
-import NoteCard from '@/components/note/Card';
+import NoteCard from '@/components/cards/NoteCard';
 import { deleteNote, useNote } from '@/lib/fetchData';
 import { useParams } from 'next/navigation'; // New approach if required
 import { Button } from '@/components/ui/button';
@@ -44,7 +44,6 @@ export default function NoteDetailsPage() {
     };
     return (
         <>
-            <NoteCard data={note} />
             <div className='space-x-2 float-end'>
                 <Button variant='outline' onClick={handleEdit}>
                     <Edit className='mr-2 h-4 w-4' /> Edit
@@ -53,6 +52,7 @@ export default function NoteDetailsPage() {
                     <Trash2 className='mr-2 h-4 w-4' /> Delete
                 </Button>
             </div>
+            <NoteCard data={note} />
         </>
     );
 }

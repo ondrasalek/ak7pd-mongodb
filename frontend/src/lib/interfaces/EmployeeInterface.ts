@@ -1,18 +1,19 @@
-import { BusinessPosition } from '@/lib/types/BusinessPositionType';
+import { BusinessPositionType } from '@/lib/types/BusinessPositionType';
 
 export interface EmployeeInterface {
-    id: string; // MongoDB ObjectId will be a string in the frontend
+    id: string; // MongoDB ObjectId as string
     name: string;
     position: string;
-    department: string;
-    createdAt: string; // Date in string format (ISO 8601)
+    department: BusinessPositionType;
+    createdAt: string; // ISO 8601 string format
+    updatedAt: string; // ISO 8601 string format
 
-    [key: string]: string | undefined; // This allows indexing with any string key, where the value is a string or undefined
+    [key: string]: string | BusinessPositionType | undefined; // Allow dynamic access with keys
 }
 
-// New interface for creating a employee
-export interface CreateEmployeeInput {
+// For creating a new employee
+export interface EmployeeInput {
     name: string;
     position: string;
-    department: BusinessPosition;
+    department: BusinessPositionType;
 }

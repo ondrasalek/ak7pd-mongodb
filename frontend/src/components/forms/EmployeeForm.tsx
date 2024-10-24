@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -16,53 +15,39 @@ import {
 import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Badge } from '@/components/ui/badge';
-import { createEmployee } from '@/lib/fetchData';
-import { CreateEmployeeInput } from '@/lib/interfaces/EmployeeInterface';
-const departments = [
-    'Developer',
-    'Manager',
-    'Designer',
-    'QA',
-    'DevOps',
-    'Engineering',
-    'Marketing',
-    'Sales',
-    'HR',
-    'Finance',
-    'Other',
-] as const;
+import {
+    EmployeeInterface,
+    EmployeeInput,
+} from '@/lib/interfaces/EmployeeInterface';
+import { BusinessPositionType } from '@/lib/types/BusinessPositionType';
 
 const employeeSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     position: z.string().min(1, 'Position is required'),
-    department: z.enum(departments),
+    department: z.nativeEnum(BusinessPositionType),
 });
 
-type EmployeeFormInputs = z.infer<typeof employeeSchema>;
+type EmployeeFormData = z.infer<typeof employeeSchema>;
 
-export default function CreateEmployeeForm() {
-    const router = useRouter();
+interface EmployeeFormProps {
+    initialData?: EmployeeInterface;
+    onSubmit: (data: EmployeeInput) => void;
+    isLoading?: boolean;
+}
 
-    const form = useForm<EmployeeFormInputs>({
+export function EmployeeForm({
+    initialData,
+    onSubmit,
+    isLoading = false,
+}: EmployeeFormProps) {
+    const form = useForm<EmployeeFormData>({
         resolver: zodResolver(employeeSchema),
-        defaultValues: {
+        defaultValues: initialData || {
             name: '',
             position: '',
-            department: 'Other',
+            department: BusinessPositionType.Other,
         },
     });
-    const onSubmit = (data: EmployeeFormInputs) => {
-        try {
-            const employeeData: CreateEmployeeInput = {
-                ...data,
-            };
-            const newEmployee = createEmployee(employeeData);
-            console.log('Employee created:', newEmployee);
-            router.push('/');
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
     return (
         <Form {...form}>
@@ -77,6 +62,7 @@ export default function CreateEmployeeForm() {
                                 <Input
                                     placeholder='Enter full name'
                                     {...field}
+                                    disabled={isLoading}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -94,6 +80,7 @@ export default function CreateEmployeeForm() {
                                 <Input
                                     placeholder='Enter position'
                                     {...field}
+                                    disabled={isLoading}
                                 />
                             </FormControl>
                             <FormMessage />
@@ -113,31 +100,41 @@ export default function CreateEmployeeForm() {
                                     onValueChange={field.onChange}
                                     defaultValue={field.value}
                                     className='flex flex-wrap gap-2'
+                                    disabled={isLoading}
                                 >
-                                    {departments.map((dept) => (
-                                        <ToggleGroupItem
-                                            key={dept}
-                                            value={dept}
-                                            asChild
-                                        >
-                                            <Badge
-                                                variant={
-                                                    field.value === dept
-                                                        ? 'default'
-                                                        : 'outline'
-                                                }
+                                    {Object.values(BusinessPositionType).map(
+                                        (dept) => (
+                                            <ToggleGroupItem
+                                                key={dept}
+                                                value={dept}
+                                                asChild
                                             >
-                                                {dept}
-                                            </Badge>
-                                        </ToggleGroupItem>
-                                    ))}
+                                                <Badge
+                                                    variant={
+                                                        field.value === dept
+                                                            ? 'default'
+                                                            : 'outline'
+                                                    }
+                                                >
+                                                    {dept}
+                                                </Badge>
+                                            </ToggleGroupItem>
+                                        )
+                                    )}
                                 </ToggleGroup>
                             </FormControl>
                             <FormMessage />
                         </FormItem>
                     )}
                 />
-                <Button type='submit'>Create Employee</Button>
+
+                <Button type='submit' disabled={isLoading}>
+                    {isLoading
+                        ? 'Creating...'
+                        : initialData
+                        ? 'Update'
+                        : 'Create'}
+                </Button>
             </form>
         </Form>
     );
