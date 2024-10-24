@@ -1,15 +1,3 @@
-// export type BusinessPositionType =
-//     | 'Developer'
-//     | 'Manager'
-//     | 'Designer'
-//     | 'QA'
-//     | 'DevOps'
-//     | 'Engineering'
-//     | 'Marketing'
-//     | 'Sales'
-//     | 'HR'
-//     | 'Finance'
-//     | 'Other';
 export enum BusinessPositionType {
     Developer = 'Developer',
     Manager = 'Manager',
