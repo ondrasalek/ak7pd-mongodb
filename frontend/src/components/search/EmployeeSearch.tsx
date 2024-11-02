@@ -66,7 +66,12 @@ const EmployeeSearch = () => {
     };
 
     if (isLoading) {
-        return <div className='text-center py-4'>Loading employees...</div>;
+        return (
+            <div className='text-center py-4'>
+                Loading employees...
+                <p>Try refreshing the page if this takes too long.</p>
+            </div>
+        );
     }
 
     if (!employees || employees.length === 0 || employees === undefined) {
