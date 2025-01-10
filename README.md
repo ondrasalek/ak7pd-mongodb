@@ -19,3 +19,8 @@ Then, you have to open another terminal and go to folder `frontend` and run the 
 
 -   [Backend README](backend/README.md)
 -   [Frontend README](frontend/README.md)
+
+## Remember
+
+-   First you have to start the backend server and then the frontend server.
+-   The backend server is running on port 8080 and the frontend server is running on port 3000.
